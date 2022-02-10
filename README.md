@@ -1,4 +1,4 @@
-###概述
+### 概述
 - 轮播图可以用UIScrollView或UICollectionView来实现。
 - 用UIScrollView实现轮播图的思路是：
 给图片数组的第一个元素（下标0）添加最后一张图片，之后再往末尾添加第一张图片，这样数组就增加了2张图片，第一个元素和倒数第二个元素是最后一张图片，最后一个元素和第二个元素是第一张图片。
@@ -8,8 +8,9 @@
 处理图片数组的方式和UIScrollView相同，都是在图片数组的前和后各加入一张图片。然后自定义一个view，UICollectionView是该view的子控件，占满该view的bounds，UICollectionViewCell也占满该view的bounds，UICollectionViewCell上面添加UIImageView。
 首次展示图片时，collectionView定位到数组的第二个元素，展示第一张图片内容。当滚动到最后一个元素时，让collectionView定位到第二个元素。当滚动到第一个元素时，让collectionView定位到倒数第二个元素。  
 `这种实现方式的特点`：无论多少图片，最多只创建3个cell，省内存。当轮播图只有一张图片时，cell只创建一个。当轮播图两张及两张以上时，cell创建3个，图片在这3个cell之间复用。
-- 无论是用UIScrollView还是用UICollectionView方式实现轮播，在横向滚动图片时，contentOffSet.x都在以屏幕宽度的大小改变，利用这一特征，当图片滚动到控件的左右边界时，调整contentOffset就可以形成循环滚动的假象。
-###具体实现
+- 无论是用UIScrollView还是用UICollectionView方式实现轮播，在横向滚动图片时，contentOffSet.x都在以屏幕宽度的大小改变，利用这一特征，当图片滚动到控件的左右边界时，调整contentOffset就可以形成循环滚动的假象。  
+
+### 具体实现
 - 以下是用UICollectionView实现轮播的案例
 自定义HRCycleView，添加到控制器上。控制器的主要代码
 ```c
@@ -21,7 +22,8 @@
     [self.view addSubview:cycleView];
 }
 ```
-HRCycleView事先创建好子控件UICollectionView和UIPageControl，提供data属性用于接收图片数组。处理循环播放的关键在于collectionView的代理方法-collectionView:didEndDisplayingCell:forItemAtIndexPath:，当cell完全移出屏幕时，该方法会获得回调，可在该方法中及时调整contentOffSet，让用户永远无法感知到UICollectionView的左右边界，具体代码如下：
+HRCycleView事先创建好子控件UICollectionView和UIPageControl，提供data属性用于接收图片数组。  
+处理循环播放的关键在于collectionView的代理方法-collectionView:didEndDisplayingCell:forItemAtIndexPath:，当cell完全移出屏幕时，该方法会获得回调，可在该方法中及时调整contentOffSet，让用户永远无法感知到UICollectionView的左右边界，具体代码如下：
 ```c
 #import "HRCycleView.h"
 #import "HRCollectionViewCell.h"
