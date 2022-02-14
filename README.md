@@ -11,16 +11,31 @@
 - 无论是用UIScrollView还是用UICollectionView方式实现轮播，在横向滚动图片时，contentOffSet.x都在以屏幕宽度的大小改变，利用这一特征，当图片滚动到控件的左右边界时，调整contentOffset就可以形成循环滚动的假象。  
 
 ### 具体实现
-- 以下是用UICollectionView实现轮播的案例
+- 效果图
+<div align=center><img width=225 height=400 src="https://img-blog.csdnimg.cn/f539808e32c04874bb2c10ad9505c961.gif"></div>
+
+- 以下先讲用UICollectionView方式实现轮播图。   
 自定义HRCycleView，添加到控制器上。控制器的主要代码
 ```c
-- (void)viewDidLoad {
-    [super viewDidLoad];
+    UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
+    tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    [self.view addSubview:tableView];
+        
+    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 500)];
+    tableView.tableHeaderView = headerView;
     
+    //用UICollectionView实现轮播
     HRCycleView *cycleView = [[HRCycleView alloc] initWithFrame:CGRectMake(0, 20, self.view.bounds.size.width, 200)];
-    cycleView.data = @[@"num_1",@"num_2",@"num_3",@"num_4",@"num_5"];
-    [self.view addSubview:cycleView];
-}
+    [headerView addSubview:cycleView];
+        
+    //下拉刷新
+    tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        
+        cycleView.data = @[@"num_1",@"num_2",@"num_3",@"num_4",@"num_5"];
+        [tableView.mj_header endRefreshing];
+    }];
+    
+    [tableView.mj_header beginRefreshing];
 ```
 HRCycleView事先创建好子控件UICollectionView和UIPageControl，提供data属性用于接收图片数组。  
 处理循环播放的关键在于collectionView的代理方法-collectionView:didEndDisplayingCell:forItemAtIndexPath:，当cell完全移出屏幕时，该方法会获得回调，可在该方法中及时调整contentOffSet，让用户永远无法感知到UICollectionView的左右边界，具体代码如下：
@@ -100,14 +115,14 @@ static NSString *cellID = @"HRCollectionViewCell";
 }
     
 #pragma mark - UIScrollViewDelegate
-//手指松开拖拽那一时刻调用
+//将要开始拖拽时调用
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
     NSLog(@"scrollViewWillBeginDragging---");
     //停止定时器
     [self.timer setFireDate:[NSDate distantFuture]];
 }
     
-//手指松开拖拽时调用
+//松开拖拽时调用。如果松开时，scrollView还能惯性滚动，decelerate则是1。如果松开时，scrollView就停止滚动了，decelerate为0
 -(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate{
     //间隔3s继续轮播
     if (_autoPage) {
@@ -142,7 +157,7 @@ static NSString *cellID = @"HRCollectionViewCell";
         [self.dataArray addObject:data.firstObject];
         [self.dataArray insertObject:data.lastObject atIndex:0];
         [self.collectionView setContentOffset:CGPointMake(self.collectionView.bounds.size.width, 0)];
-        
+            
         self.timer = [NSTimer scheduledTimerWithTimeInterval:ScrollInterval target:self selector:@selector(showNext) userInfo:nil repeats:true];
         if(_autoPage == NO) {
             self.timer.fireDate = [NSDate distantFuture];

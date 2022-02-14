@@ -81,14 +81,14 @@ static NSString *cellID = @"HRCollectionViewCell";
 }
 
 #pragma mark - UIScrollViewDelegate
-//手指松开拖拽那一时刻调用
+//将要开始拖拽时调用
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
     NSLog(@"scrollViewWillBeginDragging---");
     //停止定时器
     [self.timer setFireDate:[NSDate distantFuture]];
 }
 
-//手指松开拖拽时调用
+//松开拖拽时调用。松开时，scrollView如果还能惯性移动，decelerate则为1。如果停止滚动了，decelerate则为0
 -(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate{
     //间隔3s继续轮播
     if (_autoPage) {

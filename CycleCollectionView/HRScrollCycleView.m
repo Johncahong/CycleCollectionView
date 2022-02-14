@@ -51,7 +51,7 @@ static CGFloat ScrollInterval = 3.0f;
     [self.timer setFireDate:[NSDate distantFuture]];
 }
 
-//手指松开拖拽那一时刻调用
+//松开拖拽那一时刻调用
 -(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate{
     //间隔3s继续轮播
     if (_autoPage) {
@@ -60,11 +60,11 @@ static CGFloat ScrollInterval = 3.0f;
 }
 
 
-//调用了setContentOffset:animated:且animated为YES，当动画结束时回调
+//当调用了setContentOffset:animated:/scrollRectVisible:animated:且animated为true，动画结束时调用
 -(void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView{
     [self adjustScrollLocation];
 }
-//手指松开拖拽，scrollView会惯性滑动，滑动减速完毕时回调
+//减速结束时调用，即停止移动时调用（仅当松开拖拽后继续移动时才会被调用）
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
     [self scrollViewDidEndScrollingAnimation:scrollView];
 }
